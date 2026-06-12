@@ -24,7 +24,7 @@ Sử dụng **Playwright + Python** để kiểm thử hệ thống Mượn sác
 | #   | MSSV | Họ và tên | Vai trò     |
 | --- | ---- | --------- | ----------- |
 | 1   |      |           | Nhóm trưởng |
-| 2   |      |           | Thành viên  |
+| 2   |23BA14009|Nguyễn Cao Việt Anh | Thành viên  |
 | 3   |      |           | Thành viên  |
 | 4   |      |           | Thành viên  |
 
