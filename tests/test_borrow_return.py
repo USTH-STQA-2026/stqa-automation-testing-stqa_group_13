@@ -49,8 +49,15 @@ def test_borrow_book(page, test_config):
         6. Assert: "Đang mượn" or "thành công" appears
            (*Assert: "Đang mượn" hoặc "thành công" xuất hiện*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    book_card = page.locator('flt-semantics[role="group"][aria-label*="Có sẵn"]').first
+    book_card.locator('flt-semantics[role="button"]:has-text("Mượn sách này")').click()
+    page.wait_for_timeout(1000)
+    enable_flutter_semantics(page)
+    flutter_click_button(page, "Mượn")
+    page.wait_for_timeout(2000)
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    assert "Đang mượn" in sem_text or "thành công" in sem_text.lower(), "Mượn sách không thành công"
 
 
 def test_view_borrowed_books(page, test_config):
@@ -67,8 +74,12 @@ def test_view_borrowed_books(page, test_config):
         - Verify: books with "Đang mượn" in aria-label, or "Trả sách" button exists
           (*Kiểm tra: có sách với aria-label chứa "Đang mượn" hoặc có nút "Trả sách"*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    page.locator('flt-semantics[role="tab"][aria-label="Mượn / Trả"]').click()
+    page.wait_for_timeout(2000)
+    enable_flutter_semantics(page)
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    assert "Đang mượn" in sem_text or page.locator('flt-semantics[role="button"]:has-text("Trả sách")').count() > 0, "Không hiển thị danh sách đang mượn"
 
 
 def test_return_book(page, test_config):
@@ -87,5 +98,16 @@ def test_return_book(page, test_config):
         - Click and verify status change or success message
           (*Click và kiểm tra sách chuyển trạng thái hoặc có thông báo thành công*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    page.locator('flt-semantics[role="tab"][aria-label="Mượn / Trả"]').click()
+    page.wait_for_timeout(2000)
+    enable_flutter_semantics(page)
+    btn_return = page.locator('flt-semantics[role="button"]:has-text("Trả sách")').first
+    if btn_return.count() > 0:
+        btn_return.click()
+        page.wait_for_timeout(2000)
+        enable_flutter_semantics(page)
+        sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+        assert "thành công" in sem_text.lower() or "trả sách" in sem_text.lower(), "Trả sách không thành công"
+    else:
+        pytest.skip("Không có sách nào đang mượn để trả")

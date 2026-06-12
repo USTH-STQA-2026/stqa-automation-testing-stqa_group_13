@@ -40,8 +40,12 @@ def test_logout(page, test_config):
         4. Assert: "Đăng nhập" button or Email input exists
            (*Assert: có nút "Đăng nhập" hoặc ô input Email*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_click_button(page, "Đăng xuất")
+    page.wait_for_timeout(3000)
+    enable_flutter_semantics(page)
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    assert "Đăng nhập" in sem_text or "Email" in sem_text, "Không quay về trang đăng nhập sau khi đăng xuất"
 
 
 def test_switch_language_to_english(page, test_config):
@@ -60,5 +64,9 @@ def test_switch_language_to_english(page, test_config):
         4. Get sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
         5. Assert: "Logout" or "Borrow" or "Library" in sem_text
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_click_button(page, "EN")
+    page.wait_for_timeout(2000)
+    enable_flutter_semantics(page)
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    assert "Logout" in sem_text or "Borrow" in sem_text or "Library" in sem_text or "Search" in sem_text, "Giao diện không chuyển sang tiếng Anh"

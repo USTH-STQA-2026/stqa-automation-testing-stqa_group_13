@@ -89,8 +89,18 @@ def test_login_fail_wrong_password(page, test_config):
         6. Assert: URL still on login page OR error message shown
            (*Assert: URL vẫn ở trang đăng nhập HOẶC có thông báo lỗi*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    page.goto(test_config["base_url"], wait_until="networkidle", timeout=60000)
+    enable_flutter_semantics(page)
+    flutter_fill(page, "Email", test_config["email"])
+    flutter_fill(page, "Mật khẩu", "wrongpassword")
+    flutter_click_button(page, "Đăng nhập")
+    
+    page.wait_for_timeout(3000)
+    
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    has_user_name = test_config["display_name"] in sem_text
+    has_logout = "Đăng xuất" in sem_text or "Logout" in sem_text
+    assert not (has_user_name or has_logout), "Đăng nhập thành công với mật khẩu sai"
 
 
 def test_login_fail_empty_fields(page, test_config):
@@ -110,5 +120,13 @@ def test_login_fail_empty_fields(page, test_config):
            (*KHÔNG nhập Email/Mật khẩu — click "Đăng nhập" ngay*)
         4. Assert: URL still on login page (*Assert: URL vẫn ở trang đăng nhập*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    page.goto(test_config["base_url"], wait_until="networkidle", timeout=60000)
+    enable_flutter_semantics(page)
+    flutter_click_button(page, "Đăng nhập")
+    
+    page.wait_for_timeout(3000)
+    
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    has_user_name = test_config["display_name"] in sem_text
+    has_logout = "Đăng xuất" in sem_text or "Logout" in sem_text
+    assert not (has_user_name or has_logout), "Đăng nhập thành công khi để trống thông tin"

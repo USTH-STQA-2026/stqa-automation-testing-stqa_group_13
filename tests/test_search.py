@@ -37,8 +37,10 @@ def test_search_book_by_name(page, test_config):
         - flutter_fill(page, "Tìm kiếm theo tên sách hoặc tác giả...", "Flutter")
         - Verify: page.locator('flt-semantics[aria-label*="Flutter"]').count() > 0
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_fill(page, "Tìm kiếm theo tên sách hoặc tác giả...", "Flutter")
+    page.wait_for_timeout(2000)
+    assert page.locator('flt-semantics[aria-label*="Flutter"]').count() > 0, "Không tìm thấy kết quả Flutter"
 
 
 def test_search_book_no_result(page, test_config):
@@ -54,8 +56,10 @@ def test_search_book_no_result(page, test_config):
     Hints (*Gợi ý*):
         - Verify: page.locator('flt-semantics[role="group"][aria-label*="Mã: BOOK"]').count() == 0
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_fill(page, "Tìm kiếm theo tên sách hoặc tác giả...", "xyz_khong_ton_tai_12345")
+    page.wait_for_timeout(2000)
+    assert page.locator('flt-semantics[role="group"][aria-label*="Mã: BOOK"]').count() == 0, "Tìm thấy kết quả khi không mong muốn"
 
 
 def test_filter_by_category(page, test_config):
@@ -76,8 +80,14 @@ def test_filter_by_category(page, test_config):
         - Loop through each book, verify aria-label contains "Công nghệ"
           (*Lặp qua từng sách, kiểm tra aria-label chứa "Công nghệ"*)
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_fill(page, "Lọc theo thể loại (VD: Công nghệ, Kinh tế...)", "Công nghệ")
+    page.wait_for_timeout(2000)
+    books = page.locator('flt-semantics[role="group"][aria-label*="Mã: BOOK"]')
+    count = books.count()
+    assert count > 0, "Không có sách nào hiển thị"
+    for i in range(count):
+        assert "Công nghệ" in books.nth(i).get_attribute("aria-label"), f"Sách thứ {i} không thuộc thể loại Công nghệ"
 
 
 def test_search_by_author(page, test_config):
@@ -93,5 +103,7 @@ def test_search_by_author(page, test_config):
         - flutter_fill(page, "Tìm kiếm theo tên sách hoặc tác giả...", "Nguyễn Minh Đức")
         - Verify: page.locator('flt-semantics[aria-label*="Nguyễn Minh Đức"]').count() > 0
     """
-    # TODO: Students implement here (Sinh viên viết code ở đây)
-    pytest.skip("Not implemented — student must complete (Chưa hoàn thành)")
+    login(page, test_config)
+    flutter_fill(page, "Tìm kiếm theo tên sách hoặc tác giả...", "Nguyễn Minh Đức")
+    page.wait_for_timeout(2000)
+    assert page.locator('flt-semantics[aria-label*="Nguyễn Minh Đức"]').count() > 0, "Không tìm thấy tác giả Nguyễn Minh Đức"
