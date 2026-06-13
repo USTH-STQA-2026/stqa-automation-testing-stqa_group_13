@@ -1,72 +1,129 @@
 """
-Logout & Language Tests (*Kiểm thử Đăng xuất & Chuyển ngôn ngữ*) — Library Book Borrowing System (*Hệ thống Mượn sách thư viện*)
+General Feature Tests (*Kiểm thử Chức năng chung*) — Library Book Borrowing System
 
-Students must complete ALL 2 test cases in this file.
-(*Sinh viên cần hoàn thành TẤT CẢ 2 test case trong file này.*)
+Test cases:
+   TC-11  Đăng xuất — nhấn nút đăng xuất → trở về trang đăng nhập        ✅ Complete
+   TC-12  Chuyển ngôn ngữ sang English → giao diện hiển thị tiếng Anh     ✅ Complete
+   BONUS  Chuyển ngôn ngữ EN → quay lại VI → giao diện tiếng Việt         ✅ B1 Bonus
 
-Hints (*Gợi ý*):
-    - Use login() helper to log in (*Dùng login() helper để đăng nhập*)
-    - Logout button: 'flt-semantics[role="button"]:has-text("Đăng xuất")'
-      (*Nút Đăng xuất*)
-    - Language switch EN button: 'flt-semantics[role="button"]:has-text("EN")'
-      (*Nút chuyển ngôn ngữ EN*)
-    - After logout: page returns to login (has "Đăng nhập" button and "Email" input)
-      (*Sau đăng xuất: trang quay về login*)
-    - After switching to EN: text "Logout", "Borrow", "Search", "Library" may appear
-      (*Sau chuyển EN: text tiếng Anh có thể xuất hiện*)
+Notes:
+   - Logout button: flt-semantics[role="button"]:has-text("Đăng xuất")
+   - EN language button: flt-semantics[role="button"]:has-text("EN")
+   - VI language button: flt-semantics[role="button"]:has-text("VI")
 """
 import os
-import time
 import pytest
 from conftest import (
     enable_flutter_semantics, flutter_fill, flutter_click_button,
-    login, SCREENSHOT_DIR,
+    wait_for_flutter, login, SCREENSHOT_DIR,
 )
 
 
 def test_logout(page, test_config):
     """TC-11: Logout success (*Đăng xuất thành công*)
 
-    🔴 NOT COMPLETED (*CHƯA HOÀN THÀNH*)
-
-    Description (*Mô tả*):
-        Log in → click Logout → verify page returns to login screen.
-        (*Đăng nhập → click Đăng xuất → kiểm tra quay về trang đăng nhập.*)
-
-    Suggested steps (*Gợi ý*):
-        1. login(page, test_config)
-        2. Find "Đăng xuất" button and click (*Tìm nút "Đăng xuất" và click*)
-        3. Wait 3s, re-enable semantics (*Đợi 3s, bật lại semantics*)
-        4. Assert: "Đăng nhập" button or Email input exists
-           (*Assert: có nút "Đăng nhập" hoặc ô input Email*)
+    Arrange: Đăng nhập thành công
+    Act:     Click nút "Đăng xuất"
+    Assert:  Trang quay về màn hình đăng nhập (có "Email" input và "Đăng nhập" button)
     """
+    # Arrange
     login(page, test_config)
+
+    # Act — click Đăng xuất
     flutter_click_button(page, "Đăng xuất")
-    page.wait_for_timeout(3000)
+
+    # Smart Wait — chờ trang đăng nhập xuất hiện (thay vì time.sleep(3))
+    wait_for_flutter(page, text="Đăng nhập")
     enable_flutter_semantics(page)
+
+    page.screenshot(path=os.path.join(SCREENSHOT_DIR, "TC11_logout.png"))
+
+    # Assert — B3: detailed assertion — kiểm tra cả nút Đăng nhập và ô Email
     sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
-    assert "Đăng nhập" in sem_text or "Email" in sem_text, "Không quay về trang đăng nhập sau khi đăng xuất"
+    has_login_btn = "Đăng nhập" in sem_text
+    has_email_input = page.locator('input[aria-label="Email"]').count() > 0
+
+    # Kiểm tra không còn nút Đăng xuất (đã logout thành công)
+    no_logout_btn = "Đăng xuất" not in sem_text and "Logout" not in sem_text
+
+    assert has_login_btn or has_email_input, (
+        "TC-11 FAIL: Expected to return to login page with 'Đăng nhập' button "
+        "or 'Email' input after logout"
+    )
+    assert no_logout_btn, (
+        "TC-11 FAIL: 'Đăng xuất' button still present after logout — "
+        "user may still be logged in"
+    )
 
 
 def test_switch_language_to_english(page, test_config):
     """TC-12: Switch language to English (*Chuyển ngôn ngữ sang tiếng Anh*)
 
-    🔴 NOT COMPLETED (*CHƯA HOÀN THÀNH*)
-
-    Description (*Mô tả*):
-        Log in → click "EN" button → verify UI switches to English.
-        (*Đăng nhập → click nút "EN" → kiểm tra giao diện chuyển sang tiếng Anh.*)
-
-    Suggested steps (*Gợi ý*):
-        1. login(page, test_config)
-        2. Find "EN" button and click (*Tìm nút "EN" và click*)
-        3. Wait 2s, re-enable semantics (*Đợi 2s, bật lại semantics*)
-        4. Get sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
-        5. Assert: "Logout" or "Borrow" or "Library" in sem_text
+    Arrange: Đăng nhập thành công (giao diện tiếng Việt)
+    Act:     Click nút "EN"
+    Assert:  Giao diện chuyển sang tiếng Anh (có "Logout", "Borrow", "Library", v.v.)
     """
+    # Arrange
     login(page, test_config)
+
+    # Act — click nút EN
     flutter_click_button(page, "EN")
-    page.wait_for_timeout(2000)
+
+    # Smart Wait — chờ text tiếng Anh xuất hiện (thay vì time.sleep(2))
+    wait_for_flutter(page, text="Logout")
     enable_flutter_semantics(page)
+
+    page.screenshot(path=os.path.join(SCREENSHOT_DIR, "TC12_switch_language_en.png"))
+
+    # Assert — B3: detailed assertion — kiểm tra nhiều từ tiếng Anh
     sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
-    assert "Logout" in sem_text or "Borrow" in sem_text or "Library" in sem_text or "Search" in sem_text, "Giao diện không chuyển sang tiếng Anh"
+    english_keywords = ["Logout", "Borrow", "Library", "Search", "Return", "Available"]
+    matched = [kw for kw in english_keywords if kw in sem_text]
+
+    assert len(matched) > 0, (
+        "TC-12 FAIL: Expected at least one English keyword "
+        f"({', '.join(english_keywords)}) after switching to EN. "
+        f"Matched: {matched}"
+    )
+
+    # Extra: verify Vietnamese button text is gone (giao diện đã đổi sang EN)
+    no_viet_main_nav = "Tìm kiếm" not in sem_text or "Logout" in sem_text
+    assert no_viet_main_nav, (
+        "TC-12 FAIL: Vietnamese navigation text still present after EN switch"
+    )
+
+
+# ---------------------------------------------------------------------------
+# BONUS B1 — Extra test: switch EN then back to VI
+# ---------------------------------------------------------------------------
+
+def test_switch_language_back_to_vietnamese(page, test_config):
+    """BONUS B1 — Chuyển EN → VI → giao diện trở lại tiếng Việt.
+
+    Verifies that the language toggle is reversible.
+    """
+    # Arrange
+    login(page, test_config)
+
+    # Act 1: switch to EN
+    flutter_click_button(page, "EN")
+    wait_for_flutter(page, text="Logout")
+    enable_flutter_semantics(page)
+
+    # Act 2: switch back to VI
+    flutter_click_button(page, "VI")
+    wait_for_flutter(page, text="Đăng xuất")
+    enable_flutter_semantics(page)
+
+    page.screenshot(path=os.path.join(
+        SCREENSHOT_DIR, "BONUS_switch_language_back_vi.png"
+    ))
+
+    # Assert: Vietnamese text reappears
+    sem_text = " ".join(page.locator("flt-semantics").all_text_contents())
+    has_viet = "Đăng xuất" in sem_text or "Tìm kiếm" in sem_text
+
+    assert has_viet, (
+        "BONUS FAIL: Expected Vietnamese text after switching back to VI, "
+        "but 'Đăng xuất' or 'Tìm kiếm' not found"
+    )

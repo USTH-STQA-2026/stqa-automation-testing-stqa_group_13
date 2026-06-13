@@ -10,10 +10,10 @@ jobs:
 
     steps:
       - name: Checkout repository
-        uses: actions/checkout@v6
+        uses: actions/checkout@v4
 
       - name: Set up Python
-        uses: actions/setup-python@v6
+        uses: actions/setup-python@v5
         with:
           python-version: "3.11"
           cache: "pip"
@@ -39,11 +39,11 @@ jobs:
           TEST_DISPLAY_NAME: Nguyễn Học Bá
           CI: "true"
           HEADLESS: "false"
-        run: xvfb-run -a pytest --junitxml=report.xml
+        run: xvfb-run -a pytest --junitxml=report.xml -v
 
       - name: Upload test artifacts
         if: always()
-        uses: actions/upload-artifact@v7
+        uses: actions/upload-artifact@v4
         with:
           name: pytest-artifacts
           path: |
